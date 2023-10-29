@@ -6,12 +6,16 @@ const Trip = new Schema({
         type:String,
         required:true
     },
-    description:{
+    destination:{
+        type:String,
+        required:true
+    },
+    aboutTour:{
         type:String,
         required:true
     },
     price:{
-        type:Number,
+        type:String,
         required:true
     },
     createdAt:{
@@ -22,7 +26,7 @@ const Trip = new Schema({
         type:String,
         required:true
     },
-    endAt:{
+    duration:{
         type:String,
         required:true
     },
@@ -33,6 +37,20 @@ const Trip = new Schema({
     category:{
         type:String,
         required:true
+    },
+    inclusions:{
+        type:String
+    },
+    itenary:{
+        type:String,
+        default:null
+    },
+    exclusions:{
+        type:String 
+    },
+    roadmap:{
+        type:Array,
+        default:[]
     }
 });
 

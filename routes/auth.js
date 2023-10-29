@@ -71,7 +71,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("username", "Enter a valid username").exists(),
+    body("email", "Enter a valid email").exists(),
     body("password", "Password cannot be blank").exists(),
   ],
   async (req, res) => {
@@ -83,14 +83,14 @@ router.post(
       return res.status(400).json({ errors: errors.array(), success });
     }
 
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     try {
-      let admin = await Admin.findOne({ username });
+      let admin = await Admin.findOne({ email });
       if (!admin) {
         success = false;
         return res.status(404).json({
           success,
-          error: "Invalid Username",
+          error: "Invalid email",
         });
       }
 
@@ -114,7 +114,6 @@ router.post(
       res.json({
         success,
         authToken,
-        admin,
       });
     } catch (error) {
       console.error(error.message);

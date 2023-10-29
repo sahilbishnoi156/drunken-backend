@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const authenticateAdmin = require("../middleware/fetcher");
 const Trip = require("../models/trip");
-const { body, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 
 //TODO Add Middleware
-// Route 1: get all the trips using : Get "/api/getAllTrips"
+// Route 1: get all the trips using : Get "/api/trips/getAllTrips"
 router.get("/getAllTrips", async (req, res) => {
   try {
     const trips = await Trip.find();
@@ -16,17 +16,13 @@ router.get("/getAllTrips", async (req, res) => {
   }
 });
 
-// Route 2: add trip using : Post "/api/uploadTrip"
+// Route 2: add trip using : Post "/api/trips/uploadTrip"
 router.post(
   "/uploadTrip",
   authenticateAdmin,
-  [
-    body("title", "Enter a valid name").isLength({ min: 3 }),
-    body("description", "Enter a valid description").isLength({ min: 10 }),
-  ],
   async (req, res) => {
     try {
-      const { title, description, price, startsAt, endAt, category } = req.body;
+      const { title, aboutTour, price, startsAt, duration, category, inclusions, exclusions, roadmap, destination, images } = req.body;
       // If there are errors, return a bad request
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -34,11 +30,16 @@ router.post(
       }
       const trip = new Trip({
         title,
-        description,
+        aboutTour,
         price,
         startsAt,
-        endAt,
-        category
+        duration,
+        category,
+        inclusions,
+        exclusions,
+        roadmap,
+        images,
+        destination
       });
 
       const savedTrip = await trip.save();
@@ -51,18 +52,11 @@ router.post(
 );
 
 // Route 3: update trip using : Put "/api/updateTrip" Login required
-router.put("/updateTrip/:id", async (req, res) => {
+router.put("/updateTrip/:id",authenticateAdmin, async (req, res) => {
   try {
-    const { title, description, price, startsAt, endAt, category } = req.body;
+    const { title, aboutTour, price, startsAt, duration, category, inclusions, exclusions, roadmap, destination, images } = req.body;
     // create a newTrip object;
     const newTrip = {};
-
-    title && (newTrip.title = title);
-    description && (newTrip.description = description);
-    price && (newTrip.price = price);
-    startsAt && (newTrip.startsAt = startsAt);
-    endAt && (newTrip.endAt = endAt);
-    category && (newTrip.category = category)
     
 
     // Find the trip to be updated
@@ -70,11 +64,18 @@ router.put("/updateTrip/:id", async (req, res) => {
     if (!trip) {
       return res.status(401).send("Trip not found");
     }
+    title && (newTrip.title = title);
+    aboutTour && (newTrip.aboutTour = aboutTour);
+    price && (newTrip.price = price);
+    startsAt && (newTrip.startsAt = startsAt);
+    duration && (newTrip.duration = duration);
+    category && (newTrip.category = category);
+    inclusions && (newTrip.inclusions = inclusions);
+    exclusions && (newTrip.exclusions = exclusions);
+    roadmap && (newTrip.roadmap = roadmap);
+    destination && (newTrip.destination = destination);
+    images && (newTrip.images = images);
     
-    //TODO Uncomment and implement this section for user authorization
-    // if (trip.user.toString() !== req.user.id) {
-    //   return res.status(401).send("Not Allowed ");
-    // }
     trip = await Trip.findByIdAndUpdate(
       req.params.id,
       { $set: newTrip },
@@ -87,20 +88,14 @@ router.put("/updateTrip/:id", async (req, res) => {
   }
 });
 
-// Route 4: Delete Trip using : Delete "/api/deleteTrip" Login required
-router.delete("/deleteTrip/:id", async (req, res) => {
+// Route 4: Delete Trip using : Delete "/api/trips/deleteTrip" Login required
+router.delete("/deleteTrip/:id",authenticateAdmin, async (req, res) => {
   try {
     // Find the trip to be deleted
     const trip = await Trip.findById(req.params.id);
     if (!trip) {
       return res.status(404).json({ error: "Trip not found" });
     }
-
-    //TODO Uncomment and implement this section for user authorization
-    // if (trip.user.toString() !== req.user.id) {
-    //   return res.status(401).json({ error: "Not allowed" });
-    // }
-
     await Trip.findByIdAndDelete(req.params.id);
     res.json({ message: "Trip deleted" });
   } catch (error) {
@@ -109,7 +104,7 @@ router.delete("/deleteTrip/:id", async (req, res) => {
   }
 });
 
-router.post("/getTrip/:id", async (req, res) => {
+router.get("/getTrip/:id", async (req, res) => {
   try {
     const tripId = req.params.id;
     const trip = await Trip.findById(tripId);
