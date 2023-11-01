@@ -56,6 +56,41 @@ app.post("/api/upload", (req, res) => {
     }
   });
 });
+app.post("/api/upload/itnery", (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(500).json({ error: "Error uploading itnery" });
+    }
+
+    try {
+      const filesArray = files.files;
+
+      if (!filesArray.length) {
+        return res.status(400).json({ error: "No files provided" });
+      }
+
+      const itneryPaths = [];
+
+      for (const file of filesArray) {
+        const oldPath = file.filepath;
+        const fileName = `${Date.now()}_${file.originalFilename}`;
+        const newPath = path.join(__dirname, "uploads", fileName);
+
+        await fsPromises.rename(oldPath, newPath);
+
+        const itneryPath = `/uploads/${fileName}`;
+        itneryPaths.push(itneryPath);
+      }
+
+      return res.status(200).json({ itneryPaths });
+    } catch (error) {
+      console.error("Error moving files:", error);
+      return res.status(500).json({ error: "Error moving files" });
+    }
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

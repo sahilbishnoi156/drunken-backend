@@ -12,7 +12,6 @@ const JWT_SECRET = "#%&EJN#%W#@J&$ARHR$HEFR@$@&GJDN%$&#I!NEB$&";
 router.post(
   "/createAdmin",
   [
-    body("username", "Enter a valid name").isLength({ min: 3 }),
     body("email", "Enter a valid email").isEmail(),
     body("password", "Password must be at least 5 characters").isLength({
       min: 5,
@@ -40,7 +39,6 @@ router.post(
 
       // Create a new Admin
       admin = await Admin.create({
-        username: req.body.username,
         password: secPass,
         email: req.body.email,
       });
@@ -57,7 +55,6 @@ router.post(
       res.json({
         success,
         authToken,
-        username: req.body.username,
         email: req.body.email,
       });
     } catch (error) {
