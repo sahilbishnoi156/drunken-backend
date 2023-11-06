@@ -76,7 +76,8 @@ app.post("/api/upload/itinerary", (req, res) => {
       return res.status(200).json({ itineraryPath });
     } catch (error) {
       console.error("Error moving file:", error);
-      return res.status(500).json({ error: "Error moving file" });
+      console.log("Error moving file:", error);
+      return res.status(500).json({ error: error });
     }
   });
 });
