@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 app.use("/uploads", express.static("uploads"));
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({limit:'100mb'}));
 
 // Available Routes
 app.use("/api/auth", require("./routes/auth"));
