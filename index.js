@@ -31,11 +31,6 @@ app.post("/api/upload", (req, res) => {
 
     try {
       const filesArray = files.files;
-
-      if (!filesArray.length) {
-        return res.status(400).json({ error: "No files provided" });
-      }
-
       const imagePaths = [];
 
       for (const file of filesArray) {
@@ -56,22 +51,18 @@ app.post("/api/upload", (req, res) => {
     }
   });
 });
-app.post("/api/upload/itnery", (req, res) => {
+app.post("/api/upload/itinerary", (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      return res.status(500).json({ error: "Error uploading itnery" });
+      return res.status(500).json({ error: "Error uploading itinerary" });
     }
 
     try {
       const filesArray = files.files;
 
-      if (!filesArray.length) {
-        return res.status(400).json({ error: "No files provided" });
-      }
-
-      const itneryPaths = [];
+      const itineraryPaths = [];
 
       for (const file of filesArray) {
         const oldPath = file.filepath;
@@ -80,11 +71,11 @@ app.post("/api/upload/itnery", (req, res) => {
 
         await fsPromises.rename(oldPath, newPath);
 
-        const itneryPath = `/uploads/${fileName}`;
-        itneryPaths.push(itneryPath);
+        const itineraryPath = `/uploads/${fileName}`;
+        itineraryPaths.push(itineraryPath);
       }
 
-      return res.status(200).json({ itneryPaths });
+      return res.status(200).json({ itineraryPaths });
     } catch (error) {
       console.error("Error moving files:", error);
       return res.status(500).json({ error: "Error moving files" });

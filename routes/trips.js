@@ -17,47 +17,69 @@ router.get("/getAllTrips", async (req, res) => {
 });
 
 // Route 2: add trip using : Post "/api/trips/uploadTrip"
-router.post(
-  "/uploadTrip",
-  authenticateAdmin,
-  async (req, res) => {
-    try {
-      const { title, aboutTour, price, startsAt, duration, category, inclusions, exclusions, roadmap, destination, images } = req.body;
-      // If there are errors, return a bad request
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-      const trip = new Trip({
-        title,
-        aboutTour,
-        price,
-        startsAt,
-        duration,
-        category,
-        inclusions,
-        exclusions,
-        roadmap,
-        images,
-        destination
-      });
-
-      const savedTrip = await trip.save();
-      res.json(savedTrip);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Internal server error occurred");
+router.post("/uploadTrip", authenticateAdmin, async (req, res) => {
+  try {
+    const {
+      title,
+      aboutTour,
+      price,
+      startsAt,
+      duration,
+      category,
+      inclusions,
+      exclusions,
+      roadmap,
+      destination,
+      images,
+      itinerary,
+    } = req.body;
+    // If there are errors, return a bad request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+    const trip = new Trip({
+      title,
+      aboutTour,
+      price,
+      startsAt,
+      duration,
+      category,
+      inclusions,
+      exclusions,
+      roadmap,
+      images,
+      destination,
+      itinerary,
+    });
+
+    const savedTrip = await trip.save();
+    res.json(savedTrip);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal server error occurred");
   }
-);
+});
 
 // Route 3: update trip using : Put "/api/updateTrip" Login required
-router.put("/updateTrip/:id",authenticateAdmin, async (req, res) => {
+router.put("/updateTrip/:id", authenticateAdmin, async (req, res) => {
   try {
-    const { title, aboutTour, price, startsAt, duration, category, inclusions, exclusions, roadmap, destination, images } = req.body;
+    const {
+      title,
+      aboutTour,
+      price,
+      startsAt,
+      duration,
+      category,
+      inclusions,
+      exclusions,
+      roadmap,
+      destination,
+      images,
+      itinerary,
+    } = req.body;
     // create a newTrip object;
     const newTrip = {};
-    
 
     // Find the trip to be updated
     let trip = await Trip.findById(req.params.id);
@@ -75,7 +97,8 @@ router.put("/updateTrip/:id",authenticateAdmin, async (req, res) => {
     roadmap && (newTrip.roadmap = roadmap);
     destination && (newTrip.destination = destination);
     images && (newTrip.images = images);
-    
+    itinerary && (newTrip.itinerary = itinerary);
+
     trip = await Trip.findByIdAndUpdate(
       req.params.id,
       { $set: newTrip },
@@ -89,7 +112,7 @@ router.put("/updateTrip/:id",authenticateAdmin, async (req, res) => {
 });
 
 // Route 4: Delete Trip using : Delete "/api/trips/deleteTrip" Login required
-router.delete("/deleteTrip/:id",authenticateAdmin, async (req, res) => {
+router.delete("/deleteTrip/:id", authenticateAdmin, async (req, res) => {
   try {
     // Find the trip to be deleted
     const trip = await Trip.findById(req.params.id);
@@ -108,9 +131,9 @@ router.get("/getTrip/:id", async (req, res) => {
   try {
     const tripId = req.params.id;
     const trip = await Trip.findById(tripId);
-    if(trip){
+    if (trip) {
       res.send(trip);
-    }else{
+    } else {
       res.status(404).send("trip not found");
     }
   } catch (error) {

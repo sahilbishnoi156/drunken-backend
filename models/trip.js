@@ -41,7 +41,7 @@ const Trip = new Schema({
     inclusions:{
         type:String
     },
-    itenary:{
+    itinerary:{
         type:String,
         default:null
     },
